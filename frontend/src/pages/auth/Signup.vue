@@ -1,11 +1,8 @@
 <template>
   <div style="max-width: 300px; width: 100%;">
-    <h1 class="text-center">Sign up</h1>
-    <router-link
-      to="/"
-      class="float-left"
-    >
-      🡄  Go back
+    <h1 class="text-center">Create Account</h1>
+    <router-link to="/" class="float-left">
+       Go back
     </router-link>
     <br>
     <form class="mt-4 w-100 clearfix">
@@ -88,10 +85,7 @@
         </span>
       </button>
 
-      <router-link
-        :to="{ name: 'signin' }"
-        class="pt-2 d-block small"
-      >
+      <router-link :to="{ name: 'signin' }" class="pt-2 d-block small">
         Already have an account?
       </router-link>
     </form>
@@ -112,9 +106,9 @@ export default {
   name: 'Signup',
   data: () => ({
     form: {
-      name: 'Vasya Pupkin',
-      email: 'vasya@test.com',
-      password: 'password'
+      name: '',
+      email: '',
+      password: ''
     },
     loading: false
   }),

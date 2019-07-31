@@ -22,18 +22,18 @@
         </tr>
         <tr>
           <th scope="row">
-            Has verified email:
+            Role:
           </th>
           <td>
-            {{ $auth.user.hasVerifiedEmail }}
+            {{ $auth.user.role_id  }}
           </td>
         </tr>
         <tr>
           <th scope="row">
-            Location:
+            Has verified email:
           </th>
           <td>
-            <div id="map"/>
+            {{ $auth.user.hasVerifiedEmail }}
           </td>
         </tr>
       </tbody>
@@ -44,30 +44,13 @@
 <script>
 export default {
   data: () => ({
-    map: null
+   
   }),
   mounted () {
-    // load only once
-    if (window.google && window.google.maps) {
-      this.initMap()
-      return
-    }
-
-    const script = document.createElement('script')
-    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAqEnLDFIYA4FBcReiN2Z8eqkLidAYcpdo&callback=initMap'
-    script.async = script.defer = true
-
-    document.body.appendChild(script)
-
-    window.initMap = this.initMap
+   
   },
   methods: {
-    initMap () {
-      this.map = new window.google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 8
-      })
-    }
+    
   }
 }
 </script>

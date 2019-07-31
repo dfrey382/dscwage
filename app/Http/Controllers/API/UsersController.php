@@ -8,8 +8,8 @@ class UsersController extends BaseController
 {
     public function index()
     {
-        return User::orderBy('id', 'desc')
-            ->get();
+        $users = User::with('roles')->get();
+        return $users;
     }
 
     public function show($group)

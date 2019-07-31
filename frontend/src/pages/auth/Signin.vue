@@ -1,11 +1,8 @@
 <template>
   <div style="max-width: 300px; width: 100%;">
     <h1 class="text-center">Sign in</h1>
-    <router-link
-      to="/"
-      class="float-left"
-    >
-      🡄  Go back
+    <router-link to="/" class="float-left">
+     Go back
     </router-link>
     <br>
     <form class="mt-4 w-100">
@@ -92,8 +89,8 @@ export default {
   name: 'Signin',
   data: () => ({
     form: {
-      email: 'test@test.com',
-      password: 'password'
+      email: '',
+      password: ''
     },
     loading: false
   }),

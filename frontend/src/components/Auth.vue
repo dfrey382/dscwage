@@ -28,17 +28,11 @@
     <br>
 
     <b>User: </b><span v-show="!user">–</span>
-    <pre
-      v-if="user"
-      class="pl-4"
-    >{{ user }}</pre>
+    <pre v-if="user" class="pl-4" >{{ user }}</pre>
     <br v-else>
 
     <b class="mb-2">Token: </b>
-    <span
-      v-if="token"
-      :title="token"
-    >
+    <span v-if="token" :title="token">
       {{ token.slice(0, 40) + '...' }}
     </span>
     <span v-else>–</span>
@@ -57,8 +51,8 @@ import { mapActions, mapState, mapGetters } from 'vuex'
 export default {
   data: () => ({
     form: {
-      email: 'test@test.com',
-      password: 'password'
+      email: '',
+      password: ''
     },
     loading: false,
     tokenExpiresInFormated: null,

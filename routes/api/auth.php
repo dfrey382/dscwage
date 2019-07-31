@@ -2,7 +2,7 @@
 
 Route::group(['namespace' => 'Auth', 'prefix' => 'auth'], function () {
     Route::middleware(['guest:api'])->group(function () {
-        Route::post('signin', 'AuthController@signin');
+        Route::post('signin', 'AuthController@signin')->name('login');
         Route::post('signup', 'AuthController@signup');
 
         Route::post('forgot-password-email', 'ForgotPasswordController@sendResetLinkEmail');

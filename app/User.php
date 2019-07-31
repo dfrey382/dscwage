@@ -6,6 +6,8 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\VerifyEmail;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Role;
 
 class User extends AuthenticatableForUser implements MustVerifyEmail
 {
@@ -51,5 +53,10 @@ class User extends AuthenticatableForUser implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail);
+    }
+
+    public function roles()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 }
