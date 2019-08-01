@@ -2,7 +2,7 @@
   <div
     v-if="$auth.user" class="w-100 h-100">
     <div class="row">
-      <div class="col-3">
+      <div class="col-12">
         <div class="card">
           <div class="card-body">
                 <h1>{{ $auth.user.name }}</h1>
@@ -24,7 +24,7 @@
           </div>
         </div>
       </div>
-      <div class="col-9">
+      <div class="col-12">
         <div class="tab-content">
           <div class="tab-pane fade show active">
             <div class="d-flex justify-content-center">

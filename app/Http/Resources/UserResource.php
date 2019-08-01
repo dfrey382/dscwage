@@ -18,6 +18,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email, // короткая форма чтобы не писать ()->get()
+            'roles' => $this->roles->name,
             'hasVerifiedEmail' => $request->user()->hasVerifiedEmail(),
             'createdAt' => (string) $this->created_at,
             'updatedAt' => (string) $this->updated_at,
