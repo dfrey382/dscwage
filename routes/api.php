@@ -17,6 +17,7 @@ Route::namespace('API')->group(function () {
     require base_path('routes/api/auth.php');
     require base_path('routes/api/profile.php');
     require base_path('routes/api/users.php');
+    require base_path('routes/api/admin.php');
 });
 
 Route::get('test', function () {

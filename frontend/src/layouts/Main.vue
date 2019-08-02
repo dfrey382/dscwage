@@ -1,6 +1,7 @@
 <template>
   <div class="d-flex flex-column" style="height: 100%;">
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #1C1E3A;">
+      <div class="container">
       <a class="navbar-brand" href="#">
         {{ appName }}
       </a>
@@ -72,7 +73,9 @@
           <button class="btn btn-primary btn-sm float-right ml-2" @click="$router.push({ name: 'profile' })">
             Profile
           </button>
-
+          <button class="btn btn-primary btn-sm float-right ml-2" @click="$router.push({ name: 'role' })">
+            Roles
+          </button>
           <button class="btn btn-secondary btn-sm float-right ml-2" @click="$actionWithLoading(logout, 'loadingLogout')">
             <span v-if="loadingLogout">
               Loading...
@@ -82,6 +85,7 @@
             </span>
           </button>
         </template>
+      </div>
       </div>
     </nav>
 

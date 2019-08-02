@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Role;
 use Illuminate\Http\Request;
 
-class RoleController extends Controller
+class RoleController extends BaseController
 {
     /**
      * Display a listing of the resource.
@@ -15,6 +15,8 @@ class RoleController extends Controller
     public function index()
     {
         //
+        $roles = Role::all();
+        return $roles;
     }
 
     /**

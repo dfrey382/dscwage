@@ -4,6 +4,7 @@ import Home from '@/pages/Home.vue'
 import auth from './groups/auth'
 import profile from './groups/profile'
 import other from './groups/other'
+import Roles from '@/pages/role/Role.vue'
 
 export default [
   {
@@ -14,6 +15,11 @@ export default [
         name: 'home',
         path: '',
         component: Home
+      },
+      {
+        name: 'role',
+        path: '/roles',
+        component: Roles
       },
       ...auth,
       ...profile,
