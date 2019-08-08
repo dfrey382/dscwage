@@ -1,22 +1,24 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Model;
 
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      *
      * @return void
      */
     public function run()
     {
-        factory(\App\User::class, 5)->create();
+        Model::unguard();
 
-        factory(\App\User::class)->create([
-            'name' => 'Vladimir Putin',
-            'email' => 'test@test.com',
-            'password' => bcrypt('watoto2012!!!')
-        ]);
+        $this->call(CountriesSeeder::class);
+        $this->call(RolesSeeder::class);
+        $this->call(PermissionsSeeder::class);
+        $this->call(UserSeeder::class);
+
+        Model::reguard();
     }
 }

@@ -1,46 +1,47 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace Vanguard\Http\Middleware;
 
-use Illuminate\Auth\Middleware\Authenticate as Middleware;
-use Illuminate\Auth\AuthenticationException;
+use Closure;
+use Illuminate\Contracts\Auth\Guard;
 
-class Authenticate extends Middleware
+class Authenticate
 {
     /**
-     * Get the path the user should be redirected to when they are not authenticated.
+     * The Guard implementation.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
+     * @var Guard
      */
-    // For the API it is not necessary!
-//    protected function redirectTo($request)
-//    {
-//        return route('login');
-//    }
+    protected $auth;
 
     /**
-     * Determine if the user is logged in to any of the given guards.
+     * Create a new filter instance.
+     *
+     * @param  Guard  $auth
+     * @return void
+     */
+    public function __construct(Guard $auth)
+    {
+        $this->auth = $auth;
+    }
+
+    /**
+     * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  array  $guards
-     *
-     * @throws \Illuminate\Auth\AuthenticationException
+     * @param  \Closure  $next
+     * @return mixed
      */
-    protected function authenticate($request, array $guards)
+    public function handle($request, Closure $next)
     {
-        if (empty($guards)) {
-            $guards = [null];
-        }
-
-        foreach ($guards as $guard) {
-            if ($this->auth->guard($guard)->check()) {
-                return $this->auth->shouldUse($guard);
+        if ($this->auth->guest()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response('Unauthorized.', 401);
+            } else {
+                return redirect()->guest('login');
             }
         }
 
-        throw new AuthenticationException(
-            __('auth.unauthenticated'), $guards, $this->redirectTo($request)
-        );
+        return $next($request);
     }
 }

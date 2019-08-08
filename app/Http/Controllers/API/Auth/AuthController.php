@@ -1,151 +1,78 @@
 <?php
-namespace App\Http\Controllers\API\Auth;
 
-use App\Http\Controllers\API\BaseController;
-use Illuminate\Http\Request;
-use App\User;
-use App\Http\Requests\Auth\SignupRequest;
-use App\Http\Requests\Auth\LoginRequest;
-use App\Traits\AuthTokenResponses;
-use Illuminate\Foundation\Auth\ThrottlesLogins;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Events\Logout;
-use Illuminate\Support\Facades\Hash;
+namespace Vanguard\Http\Controllers\Api\Auth;
 
-class AuthController extends BaseController
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Vanguard\Events\User\LoggedIn;
+use Vanguard\Events\User\LoggedOut;
+use Vanguard\Http\Controllers\Api\ApiController;
+use Vanguard\Http\Requests\Auth\LoginRequest;
+use Vanguard\Services\Auth\Api\JWT;
+
+/**
+ * Class LoginController
+ * @package Vanguard\Http\Controllers\Api\Auth
+ */
+class AuthController extends ApiController
 {
-    use AuthTokenResponses, ThrottlesLogins;
-    /**
-     * Регистрация
-     */
-    public function signup(SignupRequest $request)
+    public function __construct()
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
-        ]);
-
-        event(new Registered($user));
-
-        return $this->tokenDataAndUser($user);
-//        return $this->sendResponse(NULL, 'Successfully sign up!', 201);
+        $this->middleware('guest')->only('login');
+        $this->middleware('auth')->only('logout');
     }
 
     /**
-     * sign up and return token
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Attempt to log the user in and generate unique
+     * JWT token on successful authentication.
+     * @param LoginRequest $request
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      */
-    public function signin(LoginRequest $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = array_filter(request(['name', 'email']));
+        $credentials = $request->getCredentials();
 
-        // If the class is using the ThrottlesLogins trait, we can automatically throttle
-        // the login attempts for this application. We'll key this by the username and
-        // the IP address of the client making these requests into this application.
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            // this can throw a ValidationException
-            $this->sendLockoutResponse($request);
-
-        }
-
-        $error = null;
-        // user by email or name(example)
-        if ((isset($credentials['email']) && $user = User::ofEmail($credentials['email'])->first())
-        || (isset($credentials['name']) && $user = User::ofName($credentials['name'])->first())
-        ) {
-            // check password
-            if ($request->password && !Hash::check($request->password, $user->password)) {
-                logger($request->password);
-                logger($user->password);
-                $error = 'Wrong password';
+        try {
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return $this->errorUnauthorized('Invalid credentials.');
             }
-        } else {
-            $error = isset($credentials['email']) ? 'Wrong email' : 'Wrong name';
+        } catch (JWTException $e) {
+            return $this->errorInternalError('Could not create token.');
         }
 
+        $user = auth()->user();
 
-        // if error
-        if ($error) {
-            // login attempts ++
-            $this->incrementLoginAttempts($request);
-            return $this->sendError($error, 401);
+        if ($user->isBanned()) {
+            $this->invalidateToken($token);
+            return $this->errorUnauthorized('Your account is banned by administrators.');
         }
 
-        // login attempts = 0
-        $this->clearLoginAttempts($request);
+        if ($user->isUnconfirmed()) {
+            $this->invalidateToken($token);
+            return $this->errorUnauthorized('Please confirm your email address first.');
+        }
 
-        // token and user response
-        return $this->tokenDataAndUser($user);
+        event(new LoggedIn);
+
+        return $this->respondWithArray(compact('token'));
+    }
+
+    private function invalidateToken($token)
+    {
+        JWTAuth::setToken($token);
+        JWTAuth::invalidate();
     }
 
     /**
-     * Logout user (Revoke the token)
-     *
-     * @return \Illuminate\Http\JsonResponse [string] message
+     * Logout user and invalidate token.
+     * @return \Illuminate\Http\JsonResponse
      */
     public function logout()
     {
-        $user = auth()->user();
+        event(new LoggedOut);
+
         auth()->logout();
-        event(new Logout('api', $user));
 
-        return $this->sendResponse(NULL, 'Successfully logged out');
-    }
-
-    /**
-     * Get the authenticated User
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse [json] user object
-     */
-    public function user(Request $request)
-    {
-        return $this->sendResponse([
-            'user' => $this->userData()
-        ]);
-    }
-
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Tymon\JWTAuth\Exceptions\JWTException
-     */
-    public function refresh()
-    {
-        try {
-            $token = auth()->refresh();
-
-            return response()->json($this->tokenData($token));
-        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-            //  it mean that token already refreshed
-            if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenBlacklistedException) {
-                return $this->sendResponse([
-                    'status' => 'tokenAlreadyRefreshed'
-                ]);
-            }
-            // if refresh token expired
-            if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
-                return $this->sendResponse([
-                    'status' => 'refreshTokenExpired'
-                ]);
-            }
-
-            throw $e;
-        }
-    }
-
-    /**
-     * username for Throttles
-     *
-     * @return string
-     */
-    public function username()
-    {
-        return 'email';
+        return $this->respondWithSuccess();
     }
 }

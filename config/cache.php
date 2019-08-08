@@ -1,8 +1,16 @@
 <?php
 
-use Illuminate\Support\Str;
-
 return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Cache TTL
+    |--------------------------------------------------------------------------
+    |
+    | Default cache TTL (in seconds) used for caching roles and permissions.
+    |
+    */
+    'ttl' => 3600,
 
     /*
     |--------------------------------------------------------------------------
@@ -12,8 +20,6 @@ return [
     | This option controls the default cache connection that gets used while
     | using this caching library. This connection is used when another is
     | not explicitly specified when executing a given caching function.
-    |
-    | Supported: "apc", "array", "database", "file", "memcached", "redis"
     |
     */
 
@@ -42,7 +48,7 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'table' => 'cache',
+            'table'  => 'cache',
             'connection' => null,
         ],
 
@@ -72,7 +78,7 @@ return [
 
         'redis' => [
             'driver' => 'redis',
-            'connection' => 'cache',
+            'connection' => 'default',
         ],
 
     ],
@@ -88,6 +94,9 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache'),
+    'prefix' => env(
+        'CACHE_PREFIX',
+        str_slug(env('APP_NAME', 'laravel'), '_').'_cache'
+    ),
 
 ];
